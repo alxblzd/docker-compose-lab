@@ -1,0 +1,42 @@
+---
+version: '3'
+services:
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: overseerr
+    environment:
+      - TZ=<TZ>
+      - PORT=5055 #optional
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+    ports:
+      - 5055:5055
+    volumes:
+      - /etc/docker/overseerr_config:/app/config
+    restart: unless-stopped
+  pms-docker:
+        container_name: plex
+        network_mode: host
+        environment:
+            - TZ=<TZ>
+            - PLEX_CLAIM=<claimcode>
+        volumes:
+            - '/etc/docker/plex_config:/config'
+            - '/etc/docker/plex_transcode:/transcode'
+            - '/srv/dir/dir:/data'
+        restart: unless-stopped
+        image: plexinc/pms-docker
+  tautulli:
+    image: ghcr.io/tautulli/tautulli
+    container_name: tautulli
+    restart: unless-stopped
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+    volumes:
+      - /etc/docker/tautulli:/config
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=<TZ>
+    ports:
+      - 8181:8181
