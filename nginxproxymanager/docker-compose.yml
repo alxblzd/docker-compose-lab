@@ -1,0 +1,15 @@
+---
+version: '3'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped #Ensure proxy manager survives crashes
+    ports:
+      #Allow the respective container ports to be accessible from the host machine
+      - '80:80'
+      - 'xx:81' #Port for the Admin Panel
+      - '443:443'
+    volumes:
+      #Map the following container directories to corresponding directories on the host
+      - /etc/docker/nginx_data_new:/data
+      - /etc/docker/nginx_letsencrypt_new:/etc/letsencrypt
