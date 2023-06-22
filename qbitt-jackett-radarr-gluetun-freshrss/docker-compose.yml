@@ -1,0 +1,82 @@
+---
+version: '3'
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=<provider>
+      - VPN_TYPE=<wireguard|openvpn>
+      - WIREGUARD_PRIVATE_KEY=<privatekey>
+      - WIREGUARD_ADDRESSES=<ipaddress>
+      - SERVER_CITIES=<servercity>
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+    ports:
+      - 8082:80
+      - 9117:9117
+      - 8081:8081
+      - 56388:56388
+      - 56388:56388/udp
+    restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=<TZ>
+      - WEBUI_PORT=8081
+      - DOCKER_MODS=arafatamim/linuxserver-io-mod-vuetorrent
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+    volumes:
+      - /etc/docker/config_qbitorrent:/config
+      - /srv/dir/dir:/downloads
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=<TZ>
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS= #optional
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+    volumes:
+      - /etc/docker/jackett_config:/config
+#      - /path/to/blackhole:/downloads no need since we donload from the api
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+  freshrss:
+    image: lscr.io/linuxserver/freshrss:latest
+    container_name: freshrss
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=<TZ>
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+    volumes:
+      - /etc/docker/freshrss:/config
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=<TZ>
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=true
+    volumes:
+      - /etc/docker/radarr_data:/config
+      - /srv/dir/dir/movies:/movies #optional
+    ports:
+      - 7878:7878
+    restart: unless-stopped
