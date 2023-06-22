@@ -1,0 +1,22 @@
+version: '3'
+services:
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    environment:
+      - TZ=<TZ>
+      - WATCHTOWER_SCHEDULE= * * 5 * * *
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_MONITOR_ONLY=true
+      - WATCHTOWER_NOTIFICATIONS=email
+      - WATCHTOWER_NOTIFICATION_EMAIL_FROM=<emailfrom>
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=<emaildest>
+      # you have to use a network alias here, if you use your own certificate
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=<mailserverfqdn>
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=<mailuser>
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=<mailuserpasswd>
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT=<servport>
+      - WATCHTOWER_NOTIFICATION_EMAIL_DELAY=2
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json
