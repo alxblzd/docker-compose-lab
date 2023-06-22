@@ -1,0 +1,25 @@
+---
+version: '3'
+services:
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    environment:
+      - TZ=<TZ>
+      - WATCHTOWER_SCHEDULE= * * 5 * * *
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_MONITOR_ONLY=false
+      - WATCHTOWER_NOTIFICATIONS=email
+      - WATCHTOWER_NOTIFICATION_EMAIL_FROM=<mailaddresssource>
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=<mailaddressdest>
+      # you have to use a network alias here, if you use your own certificate
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=<mailserverfqdn>
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=<mailuser>
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=<mailuserpassword>
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT=<port>
+      - WATCHTOWER_NOTIFICATION_EMAIL_DELAY=2
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json 
+#/!\ /root/.docker/config.json need to be a file not a directory if so, rmdir /root/.docker/config.json/ then : touch /root/.docker/config.json
